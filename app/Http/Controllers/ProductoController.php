@@ -3,62 +3,78 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Producto;
+use App\Models\Usuario;
 
 class ProductoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // Obtener todos los productos
     public function index()
     {
-        //
+        return response()->json(Producto::all(), 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
+    // Insertar un nuevo producto
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nombre' => 'required|string|max:100',
+            'descripcion' => 'nullable|string|max:200',
+            'cantidad' => 'required|integer|min:0',
+            'estado' => 'required|boolean',
+            'id_vendedor' => 'required|exists:usuarios,id',
+        ]);
+
+        $producto = Producto::create($request->all());
+
+        return response()->json(['message' => 'Producto creado', 'producto' => $producto], 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    // Mostrar un solo producto
+    public function show($id)
     {
-        //
+        $producto = Producto::find($id);
+
+        if (!$producto) {
+            return response()->json(['message' => 'Producto no encontrado'], 404);
+        }
+
+        return response()->json($producto, 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    // Actualizar un producto
+    public function update(Request $request, $id)
     {
-        //
+        $producto = Producto::find($id);
+
+        if (!$producto) {
+            return response()->json(['message' => 'Producto no encontrado'], 404);
+        }
+
+        $request->validate([
+            'nombre' => 'sometimes|string|max:100',
+            'descripcion' => 'sometimes|string|max:200',
+            'cantidad' => 'sometimes|integer|min:0',
+            'estado' => 'sometimes|boolean',
+            'id_vendedor' => 'sometimes|exists:usuarios,id',
+        ]);
+
+        $producto->update($request->all());
+
+        return response()->json(['message' => 'Producto actualizado', 'producto' => $producto], 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    // Eliminar un producto
+    public function destroy($id)
     {
-        //
-    }
+        $producto = Producto::find($id);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        if (!$producto) {
+            return response()->json(['message' => 'Producto no encontrado'], 404);
+        }
+
+        $producto->delete();
+
+        return response()->json(['message' => 'Producto eliminado'], 200);
     }
 }
