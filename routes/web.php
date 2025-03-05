@@ -7,5 +7,5 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/dashboard', function () {
-    return "Bienvenido al Dashboard"; // Luego puedes cambiar esto a una vista
+    return "Bienvenido al Dashboard"; 
 })->name('dashboard')->middleware('auth');
