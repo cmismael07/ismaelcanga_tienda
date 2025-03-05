@@ -24,6 +24,8 @@ class RouteServiceProvider extends ServiceProvider
     public function boot()
     {
         //
+        Route::middlewareGroup('admin', [AdminMiddleware::class]);
+        
         $this->routes(function () {
             // Carga las rutas API desde routes/api.php con el middleware 'api'
             Route::middleware('api')
