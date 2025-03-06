@@ -2,79 +2,76 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Producto;
+use App\Models\Categoria;
 use App\Models\Usuario;
+use Illuminate\Http\Request;
 
 class ProductoController extends Controller
 {
-    // Obtener todos los productos
     public function index()
     {
-        return response()->json(Producto::all(), 200);
+        $productos = Producto::all();
+        return view('productos.index', compact('productos'));
     }
 
-    // Insertar un nuevo producto
+    public function create()
+    {
+        $usuarios = Usuario::all(); 
+        
+        $categorias = Categoria::all();
+        return view('productos.create', compact('categorias', 'usuarios'));
+
+        
+    
+    }
+
     public function store(Request $request)
     {
         $request->validate([
             'nombre' => 'required|string|max:100',
-            'descripcion' => 'nullable|string|max:200',
-            'cantidad' => 'required|integer|min:0',
-            'estado' => 'required|boolean',
+            'cantidad' => 'required|integer|min:1',
             'id_vendedor' => 'required|exists:usuarios,id',
         ]);
 
-        $producto = Producto::create($request->all());
+        Producto::create([
+            'nombre' => $request->nombre,
+            'descripcion' => $request->descripcion,
+            'cantidad' => $request->cantidad,
+            'estado' => 0, // Inactivo por defecto
+            'id_vendedor' => $request->id_vendedor,
+        ]);
 
-        return response()->json(['message' => 'Producto creado', 'producto' => $producto], 201);
+        return redirect()->route('productos.index')->with('success', 'Producto creado.');
     }
 
-    // Mostrar un solo producto
-    public function show($id)
+    public function edit(Producto $producto)
     {
-        $producto = Producto::find($id);
-
-        if (!$producto) {
-            return response()->json(['message' => 'Producto no encontrado'], 404);
-        }
-
-        return response()->json($producto, 200);
+        $categorias = Categoria::all();
+        return view('productos.edit', compact('producto', 'categorias'));
     }
 
-    // Actualizar un producto
-    public function update(Request $request, $id)
+    public function update(Request $request, Producto $producto)
     {
-        $producto = Producto::find($id);
-
-        if (!$producto) {
-            return response()->json(['message' => 'Producto no encontrado'], 404);
-        }
-
         $request->validate([
-            'nombre' => 'sometimes|string|max:100',
-            'descripcion' => 'sometimes|string|max:200',
-            'cantidad' => 'sometimes|integer|min:0',
-            'estado' => 'sometimes|boolean',
-            'id_vendedor' => 'sometimes|exists:usuarios,id',
+            'nombre' => 'required|string|max:100',
+            'cantidad' => 'required|integer|min:1',
         ]);
 
         $producto->update($request->all());
 
-        return response()->json(['message' => 'Producto actualizado', 'producto' => $producto], 200);
+        return redirect()->route('productos.index')->with('success', 'Producto actualizado.');
     }
 
-    // Eliminar un producto
-    public function destroy($id)
+    public function destroy(Producto $producto)
     {
-        $producto = Producto::find($id);
-
-        if (!$producto) {
-            return response()->json(['message' => 'Producto no encontrado'], 404);
-        }
-
         $producto->delete();
+        return redirect()->route('productos.index')->with('success', 'Producto eliminado.');
+    }
 
-        return response()->json(['message' => 'Producto eliminado'], 200);
+    public function activar(Producto $producto)
+    {
+        $producto->update(['estado' => 1]);
+        return redirect()->route('productos.index')->with('success', 'Producto activado.');
     }
 }
