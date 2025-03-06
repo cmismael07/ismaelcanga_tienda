@@ -11,7 +11,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+   return view('dashboard');
 })->name('dashboard')->middleware('auth');
 
 Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function () {
