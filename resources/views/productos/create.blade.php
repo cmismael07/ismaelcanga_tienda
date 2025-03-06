@@ -23,14 +23,18 @@
 
         <div class="mb-3">
             <label>Vendedor:</label>
-            <input type="number" name="id_vendedor" class="form-control" required>
+            <select name="id_vendedor" class="form-control" required>
+            @foreach ($usuarios as $usuario)
+            <option value="{{ $usuario->id }}">{{ $usuario->nombre }}</option>
+        @endforeach
+            </select>
         </div>
 
         <div class="mb-3">
             <label>Categoría:</label>
-            <select name="categoria_id" class="form-control">
-                @foreach ($categorias as $categoria)
-                    <option value="{{ $categoria->id }}">{{ $categoria->nombre }}</option>
+            <select name="categoria_id" class="form-control" required>
+             @foreach ($categorias as $categoria)
+            <option value="{{ $categoria->id }}">{{ $categoria->nombre }}</option>
                 @endforeach
             </select>
         </div>

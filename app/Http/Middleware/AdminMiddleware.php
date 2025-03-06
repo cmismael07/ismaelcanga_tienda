@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Middleware;
 
 use Closure;
@@ -10,11 +9,15 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->check() && auth()->user()->admin) {
-            return $next($request);
+        if (!auth()->check()) {
+            return redirect('/login')->with('error', 'Debes iniciar sesión.');
         }
 
-        return redirect('/')->with('error', 'No tienes permisos para acceder.');
+        if (!auth()->user()->admin) {
+            return redirect('/')->with('error', 'No tienes permisos para acceder.');
+        }
+
+        return $next($request);
     }
 }
 
